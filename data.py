@@ -42,3 +42,27 @@ def freq_ranking(word):
     val = dfranks['first'][word[0]] + dfranks['second'][word[1]] +dfranks['third'][word[2]] + dfranks['fourth'][word[3]] +dfranks['fifth'][word[4]]
     return val
 
+df_word_ranks = pd.DataFrame({'word' : [],'value':[]})
+
+word_freq = {'word':'value'}
+for word in words5:
+    df_word_ranks.loc[len(df_word_ranks.index), 'word'] = word
+    df_word_ranks.loc[len(df_word_ranks.index)-1, 'value'] = freq_ranking(word)
+
+def remove_by_location(loc,letter,df):
+    df_sub = df
+    for l in letter:
+        df_sub = (df_sub.loc[(df_sub['word'].str[loc]== l)])
+    return df_sub
+
+def remove_by_contains(letters,df):
+    df_sub = df
+    for l in letters:
+        df_sub = (df_sub.loc[(df_sub['word'].str.contains(l))])
+    return df_sub
+
+def remove_notcontains(grey,df):
+    df_sub = df
+    for l in grey:
+        df_sub = (df_sub.loc[(~df_sub['word'].str.contains(l))])
+    return df_sub
