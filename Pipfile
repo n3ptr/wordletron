@@ -10,6 +10,7 @@ pipenv = "*"
 install = "*"
 english-words = "*"
 numpy = "*"
+ipyparallel = "*"
 
 [dev-packages]
 
