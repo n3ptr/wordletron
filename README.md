@@ -1,2 +1,2 @@
-# wordletron2000
+# wordletron
 a bot that does the wordle
