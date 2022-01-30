@@ -12,6 +12,8 @@ english-words = "*"
 numpy = "*"
 ipyparallel = "*"
 selenium = "*"
+requests = "*"
+beautifulsoup4 = "*"
 
 [dev-packages]
 
