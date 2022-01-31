@@ -1,46 +1,78 @@
 from english_words import english_words_set
 import pandas as pd
 import numpy as np
-import data as dt
+import func as f
+import requests
+from time import sleep
+from bs4 import BeautifulSoup as bs4
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 
 
-round = 0
-df_options = dt.df_word_ranks
+f = open('data/rankset.csv','r')
+guesses = []
 
-print('strongest suggestions')
-print(df_options.nlargest(3, 'value'))
+for line in f:
+    guesses.append(line.strip())
 
-while round <= 6:
-    round += 1 
-    if round == 1:
+print(str(len(guesses)))
 
-        print('initial guess')
-        word = input('enter your guess:')
-        pass
+def check_result(row, browser):
+    ''' 
+    row:  is being the game row you want data from
+    browser: this needs passed the web controler you would like to use
+    '''
+    results = {}
+    qry_script = f"""return document.querySelector('game-app').shadowRoot.querySelectorAll('game-row')[{row}].shadowRoot.querySelectorAll('game-tile[letter]')"""
+    qry_r = browser.execute_script(qry_script)
+    for i, element in enumerate(qry_r):
+        try:
+            sub = element.get_attribute("outerHTML")
+            letter = sub[(sub.find('letter=')+8):(sub.find('letter=')+9)]
+            stat_target = (sub.find('" reveal')+1) - (sub.find('evaluation=')) - 11
+            status = sub[(sub.find('evaluation='))+12:(sub.find('evaluation='))+10+stat_target]
+            # store the resutls to return
+            results[letter] = [status,str(i)] 
+        except:
+            print(f"no result for row {row}")
+    return results
 
-    if round > 1:
+# import guess dataset
+value_set = pd.read_csv('data/rank_set.csv')
+value_no_doubles = (value_set.loc[(value_set['double']!=True)])
 
-        not_char = input('enter eliminated letters:[l,e,t,t,e,r]')
-        is_char = input('enter confirmed letters:[y,e,s]')
-        loc_letters = input('enter confirmed locations: [letter,location]')
+max_val_guess = (value_no_doubles['guess'][value_no_doubles['total_score'].idxmax()])
 
-        # eliminate options, and show the reduced best 5 choices
-        if len(not_char)>0:
-            df_options = dt.remove_notcontains(not_char,df_options)
 
-        if len(is_char)>0:
-            df_options = dt.remove_by_contains(is_char,df_options)
+try: 
+    browser = webdriver.Firefox()
+    browser.get('https://www.powerlanguage.co.uk/wordle/')
+    assert 'Wordle' in browser.title
 
-        if len(loc_letters)>0:
-            # remove by letters in correct location
-            for i in range(0,int(len(loc_letters)),2):
-                df_options = dt.remove_by_location(loc=int(loc_letters[i+1]),letter=str(loc_letters[i]),df=df_options)
+    elem = browser.find_element(By.CLASS_NAME, 'nightmode')
+    sleep(3)
+    elem.click()
 
-        
-        next_best = (df_options['word'][df_options['value'].idxmax()])
-        print('from the results of the last guess')
-        print('next best option is ' + str(next_best))
-        print('your top remaiing options are: ')
-        print(df_options.head(3))
+    # get first best guess
 
-    print(str(round))
+    # loop
+    for i in range(4):
+
+
+    # get results of first guess and calculate next best
+    # from the results filter the guess pool
+    # try the next best guess
+
+
+    results = f.check_resutls(browser)
+    f.enter_guess(results)
+    
+    row = 0
+    check_result(row=row,browser=browser)
+    guess = 'ouija'
+    elem.send_keys(guess + Keys.RETURN)
+
+
+except:
+    print('error finding webpage')
