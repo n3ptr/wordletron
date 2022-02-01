@@ -10,7 +10,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
 
-f = open('data/rankset.csv','r')
+f = open('data/rank_set.csv','r')
 guesses = []
 
 for line in f:
@@ -18,11 +18,46 @@ for line in f:
 
 print(str(len(guesses)))
 
+# import guess dataset
+value_set = pd.read_csv('data/rank_set.csv')
+value_no_doubles = (value_set.loc[(value_set['double']!=True)])
+value_no_doubles_solutions = (value_no_doubles.loc[(value_no_doubles['solution']==True)])
+
+guess = (value_no_doubles['guess'][value_no_doubles['total_score'].idxmax()])
+
+def remove_notcontains(grey,df):
+    df_sub = df
+    for l in grey:
+        df_sub = (df_sub.loc[(~df_sub['guess'].str.contains(l))])
+    return df_sub
+
+def remove_by_contains(letters,df):
+    df_sub = df
+    for l in letters:
+        df_sub = (df_sub.loc[(df_sub['guess'].str.contains(l))])
+    return df_sub
+
+def remove_by_location(loc,letter,df):
+    df_sub = df
+    loc = loc # for easier use 0 is positon 1
+    for l in letter:
+        df_sub = (df_sub.loc[(df_sub['guess'].str[loc]==l)])
+    return df_sub
+
+def remove_by_not_location(loc,letter,df):
+    df_sub = df
+    loc = loc # for easier use 0 is positon 1
+    for l in letter:
+        df_sub = (df_sub.loc[(df_sub['guess'].str[loc]!=l)])
+    return df_sub
+    
+def remove_by_letter_count(letter,count,df):
+    df_sub = df
+    for l in letter:
+        df_sub = (df_sub.loc[(df_sub['guess'].str.count(letter)==count)])
+    return df_sub
+
 def check_result(row, browser):
-    ''' 
-    row:  is being the game row you want data from
-    browser: this needs passed the web controler you would like to use
-    '''
     results = {}
     qry_script = f"""return document.querySelector('game-app').shadowRoot.querySelectorAll('game-row')[{row}].shadowRoot.querySelectorAll('game-tile[letter]')"""
     qry_r = browser.execute_script(qry_script)
@@ -33,46 +68,61 @@ def check_result(row, browser):
             stat_target = (sub.find('" reveal')+1) - (sub.find('evaluation=')) - 11
             status = sub[(sub.find('evaluation='))+12:(sub.find('evaluation='))+10+stat_target]
             # store the resutls to return
-            results[letter] = [status,str(i)] 
+            print(letter)
+            print(status)
+            print(str(i))
+            results[letter+str(i)] = [status,str(i)] 
         except:
             print(f"no result for row {row}")
     return results
 
-# import guess dataset
-value_set = pd.read_csv('data/rank_set.csv')
-value_no_doubles = (value_set.loc[(value_set['double']!=True)])
+def next_guess(result, df):
+    for v in result:
+        letter = v[0] 
+        status = result[v][0]
+        placement = int(result[v][1])
+        if status == 'correct':
+            print('correct')
+            df = remove_by_contains(letter,df)
+            df = remove_by_location(placement,letter,df)
+        elif status == 'present':
+            print('present')
+            df = remove_by_contains(letter,df)
+        elif status == 'absent':
+            print('absent')
+            df = remove_notcontains(letter,df)
 
-max_val_guess = (value_no_doubles['guess'][value_no_doubles['total_score'].idxmax()])
+    return df
 
+# try: 
+browser = webdriver.Firefox()
+browser.get('https://www.powerlanguage.co.uk/wordle/')
+assert 'Wordle' in browser.title
 
-try: 
-    browser = webdriver.Firefox()
-    browser.get('https://www.powerlanguage.co.uk/wordle/')
-    assert 'Wordle' in browser.title
+elem = browser.find_element(By.CLASS_NAME, 'nightmode')
+sleep(3)
+elem.click()
 
-    elem = browser.find_element(By.CLASS_NAME, 'nightmode')
-    sleep(3)
-    elem.click()
+# get first best guess from import dataset
+elem.send_keys(guess + Keys.RETURN)
 
-    # get first best guess
+# first guess is on it's own, then start loop
 
-    # loop
-    for i in range(4):
+sleep(3)
 
+first_result = check_result(0,browser)
+df_filter = next_guess(first_result, value_no_doubles)
 
-    # get results of first guess and calculate next best
-    # from the results filter the guess pool
-    # try the next best guess
-
-
-    results = f.check_resutls(browser)
-    f.enter_guess(results)
+for i in range(1,4):
+    guess = (df_filter['guess'][df_filter['total_score'].idxmax()])
     
-    row = 0
-    check_result(row=row,browser=browser)
-    guess = 'ouija'
     elem.send_keys(guess + Keys.RETURN)
 
+    sleep(3)
 
-except:
-    print('error finding webpage')
+    result = check_result(i,browser)
+
+    df_filter = next_guess(result, df_filter)
+    
+
+browser.close()
