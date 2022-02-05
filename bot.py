@@ -1,14 +1,11 @@
 from english_words import english_words_set
 import pandas as pd
-import numpy as np
 import func as f
-import requests
 from time import sleep
 from bs4 import BeautifulSoup as bs4
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-
 
 f = open('data/rank_set.csv','r')
 guesses = []
@@ -22,41 +19,38 @@ print(str(len(guesses)))
 value_set = pd.read_csv('data/rank_set.csv')
 value_no_doubles = (value_set.loc[(value_set['double']!=True)])
 value_no_doubles_solutions = (value_no_doubles.loc[(value_no_doubles['solution']==True)])
+value_solutions_doubles = (value_no_doubles.loc[(value_no_doubles['solution']==True)])
 
 guess = (value_no_doubles['guess'][value_no_doubles['total_score'].idxmax()])
+
 
 def remove_notcontains(grey,df):
     df_sub = df
     for l in grey:
         df_sub = (df_sub.loc[(~df_sub['guess'].str.contains(l))])
     return df_sub
-
 def remove_by_contains(letters,df):
     df_sub = df
     for l in letters:
         df_sub = (df_sub.loc[(df_sub['guess'].str.contains(l))])
     return df_sub
-
 def remove_by_location(loc,letter,df):
     df_sub = df
     loc = loc # for easier use 0 is positon 1
     for l in letter:
         df_sub = (df_sub.loc[(df_sub['guess'].str[loc]==l)])
     return df_sub
-
 def remove_by_not_location(loc,letter,df):
     df_sub = df
     loc = loc # for easier use 0 is positon 1
     for l in letter:
         df_sub = (df_sub.loc[(df_sub['guess'].str[loc]!=l)])
     return df_sub
-    
 def remove_by_letter_count(letter,count,df):
     df_sub = df
     for l in letter:
         df_sub = (df_sub.loc[(df_sub['guess'].str.count(letter)==count)])
     return df_sub
-
 def check_result(row, browser):
     results = {}
     qry_script = f"""return document.querySelector('game-app').shadowRoot.querySelectorAll('game-row')[{row}].shadowRoot.querySelectorAll('game-tile[letter]')"""
@@ -75,7 +69,6 @@ def check_result(row, browser):
         except:
             print(f"no result for row {row}")
     return results
-
 def next_guess(result, df):
     for v in result:
         letter = v[0] 
@@ -83,18 +76,18 @@ def next_guess(result, df):
         placement = int(result[v][1])
         if status == 'correct':
             print('correct')
-            df = remove_by_contains(letter,df)
+            # df = remove_by_contains(letter,df)
             df = remove_by_location(placement,letter,df)
         elif status == 'present':
             print('present')
             df = remove_by_contains(letter,df)
+            df = remove_by_not_location(placement,letter,df)
         elif status == 'absent':
             print('absent')
             df = remove_notcontains(letter,df)
 
     return df
 
-# try: 
 browser = webdriver.Firefox()
 browser.get('https://www.powerlanguage.co.uk/wordle/')
 assert 'Wordle' in browser.title
@@ -107,13 +100,12 @@ elem.click()
 elem.send_keys(guess + Keys.RETURN)
 
 # first guess is on it's own, then start loop
-
 sleep(3)
 
 first_result = check_result(0,browser)
 df_filter = next_guess(first_result, value_no_doubles)
 
-for i in range(1,4):
+for i in range(1,6):
     guess = (df_filter['guess'][df_filter['total_score'].idxmax()])
     
     elem.send_keys(guess + Keys.RETURN)
