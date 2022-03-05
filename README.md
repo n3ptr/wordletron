@@ -18,7 +18,7 @@ Part 2. the bot
 1. pull in our dataset, and pick a starting word
 2. navigate to [powerlanguage.co.uk/wordle](https://www.nytimes.com/games/wordle/index.html "or now https://www.nytimes.com/games/wordle/index.html")
 
-3. write and read from the site the site to enter our words
+3. write and read from the site the site to enter and check our words
 
 
 ## Using this bot
