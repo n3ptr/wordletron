@@ -2,7 +2,7 @@
 
 A bot that does the wordle
 
-Wordle became wildly popular at the end of 2021 and after having fun playing the game I decided that what could be more fun than automating the game? 
+Wordle became wildly popular at the end of 2021 and after having fun playing the game,  I thought the next fun I would have would be to automate and try to optimise the game-play.
 
 The effort in this bot is broken down into two phases:
 
@@ -15,6 +15,6 @@ Part 2. the bot
 1. pull in our dataset, and pick a starting word
 2. navigate to [powerlanguage.co.uk/wordle](https://www.nytimes.com/games/wordle/index.html "or now https://www.nytimes.com/games/wordle/index.html")
 
-3. write and read from the site the site to enter our words!
+3. write and read from the site the site to enter our words
 
 

@@ -5,7 +5,10 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-rank_set_path = 'data_analysis/datasets/rank_set.csv'
+# todo - this bot plays as if on hard mode each time, and could be improved by taking a second guess that exists to eliminate more letters
+# todo - bot also needs a better way to deal with potential double letters, and reopen the pool if other solutions do not exist
+
+rank_set_path = 'data_analysis/datasets/large_rank_no_doubles'
 
 f = open(rank_set_path,'r')
 
@@ -90,7 +93,7 @@ def next_guess(result, df):
     return df
 
 browser = webdriver.Firefox()
-browser.get('https://www.powerlanguage.co.uk/wordle/')
+browser.get('https://www.nytimes.com/games/wordle/index.html')
 assert 'Wordle' in browser.title
 
 elem = browser.find_element(By.CLASS_NAME, 'nightmode')
