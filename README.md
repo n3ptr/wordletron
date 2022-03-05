@@ -14,7 +14,7 @@ Part 1. data exploration
         1. creating a ranking of the words based on the frequency of letters in the five positions, and create a value set from adding the letters and position information together
         2. the more intensive attempt is to check each word against all other words for how many matches it would generate as a starting word. This gives more value to direct matches, and less value to partial matches to create this map. 
 
-Part 2. the bot
+Part 2. the web control and game loop
 1. pull in our dataset, and pick a starting word
 2. navigate to [powerlanguage.co.uk/wordle](https://www.nytimes.com/games/wordle/index.html "or now https://www.nytimes.com/games/wordle/index.html")
 
