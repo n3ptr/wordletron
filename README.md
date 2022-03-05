@@ -21,7 +21,7 @@ Part 2. the bot
 3. write and read from the site the site to enter our words
 
 
-# Using this bot
+## Using this bot
 
 1. You will need to install the python packages listed in the Pipfile
 2. Have firefox installed
