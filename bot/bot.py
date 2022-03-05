@@ -1,13 +1,14 @@
-from english_words import english_words_set
 import pandas as pd
-import func as f
 from time import sleep
 from bs4 import BeautifulSoup as bs4
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 
-f = open('data/rank_set.csv','r')
+rank_set_path = 'data_analysis/datasets/rank_set.csv'
+
+f = open(rank_set_path,'r')
+
 guesses = []
 
 for line in f:
@@ -16,13 +17,13 @@ for line in f:
 print(str(len(guesses)))
 
 # import guess dataset
-value_set = pd.read_csv('data/rank_set.csv')
+value_set = pd.read_csv(rank_set_path)
 value_no_doubles = (value_set.loc[(value_set['double']!=True)])
 value_no_doubles_solutions = (value_no_doubles.loc[(value_no_doubles['solution']==True)])
 value_solutions_doubles = (value_no_doubles.loc[(value_no_doubles['solution']==True)])
 
 guess = (value_no_doubles['guess'][value_no_doubles['total_score'].idxmax()])
-
+# guess = 'cumin'
 
 def remove_notcontains(grey,df):
     df_sub = df
