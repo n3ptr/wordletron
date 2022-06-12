@@ -14,7 +14,7 @@ f = open(rank_set_path,'r')
 
 guesses = []
 
-# teaching myself how to use vim to edit a file
+# todo - this function needs to be improved to deal with double letters
 
 for line in f:
     guesses.append(line.strip())
