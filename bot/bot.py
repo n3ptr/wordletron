@@ -14,6 +14,8 @@ f = open(rank_set_path,'r')
 
 guesses = []
 
+# teaching myself how to use vim to edit a file
+
 for line in f:
     guesses.append(line.strip())
 
